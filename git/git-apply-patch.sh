@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 set -euo pipefail
 #//////////////////////////////////////////////////////////////
 #//   ____                                                   //
@@ -11,7 +11,7 @@ set -euo pipefail
 #//                                                          //
 #//  Script, 2021                                            //
 #//  Created: 21, June, 2021                                 //
-#//  Modified: 21, June, 2021                                //
+#//  Modified: 24, July, 2021                                //
 #//  file: -                                                 //
 #//  -                                                       //
 #//  Source:                                                 //
@@ -19,6 +19,14 @@ set -euo pipefail
 #//  CPU: ALL                                                //
 #//                                                          //
 #//////////////////////////////////////////////////////////////
-git apply --stat $1
-git apply --check $1
-git am --signoff < $1
+if (( $# >= 1 )); then
+    for var in "$@"
+    do
+        git apply --stat $var
+        git apply --check $var
+        git am --signoff < $var
+    done
+else
+    echo "Usage: ${0##*/} <patch 1> <patch 2>..."
+    exit 1
+fi

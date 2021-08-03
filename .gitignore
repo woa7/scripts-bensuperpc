@@ -127,7 +127,15 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
 package_build/
-*.7z
 *.sha384
-*.tar.xz
+
+# Archives
+*.7z
+*.xz
+*.zip
+*.tar
+*.7z
+*.rar
+WIP/*

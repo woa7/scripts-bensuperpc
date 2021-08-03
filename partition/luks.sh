@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 set -euo pipefail
 #//////////////////////////////////////////////////////////////
 #//   ____                                                   //
@@ -10,8 +10,8 @@ set -euo pipefail
 #//////////////////////////////////////////////////////////////
 #//                                                          //
 #//  Script, 2020                                            //
-#//  Created: 21, November, 2020                             //
-#//  Modified: 21, November, 2020                            //
+#//  Created: 20, June, 2020                                 //
+#//  Modified: 28, July, 2021                                //
 #//  file: -                                                 //
 #//  -                                                       //
 #//  Source: -                                               //
@@ -19,10 +19,43 @@ set -euo pipefail
 #//  CPU: ALL                                                //
 #//                                                          //
 #//////////////////////////////////////////////////////////////
-if (( $# < 3 )); then
-    sudo cryptsetup -v --type luks --cipher aes-xts-plain64 --key-size 512 --hash sha512 --iter-time 2000 --use-urandom --verify-passphrase luksFormat --label=$2 $1
-    sudo cryptsetup luksOpen $1 test
-    sudo mkfs.btrfs /dev/mapper/test
-    sudo mkfs.btrfs -f --label $2 /dev/mapper/test
-    sudo cryptsetup luksClose test
+
+if [[ "$EUID" = 0 ]]; then
+    echo "(1) already root"
+else
+    sudo -k # make sure to ask for password on next sudo
+    if sudo true; then
+        echo "(2) correct password"
+    else
+        echo "(3) wrong password"
+        exit 1
+    fi
+fi
+
+if (( $# == 2 )); then
+    PARTITION=$1
+    LABEL=$2
+    shift 2
+
+    if [ $# -eq 0 ]; then
+        read -r -p "you are going to format a partition/device with LUKS and BTRFS.
+    All data on the partition/devices will be erased ! Do you want to continue ? [Y/n]: " answ
+        if [ "$answ" == 'n' ]; then
+            exit 1
+        fi
+    fi
+
+    UUID=$(uuidgen)
+    echo "UUID: ${UUID}"
+    sudo umount "$PARTITION" || true
+    sudo cryptsetup -v --type luks --cipher aes-xts-plain64 --key-size 512 --hash sha512 --iter-time 1000 --use-urandom --verify-passphrase luksFormat --label="$LABEL" "$PARTITION"
+    sudo cryptsetup -v luksOpen "$PARTITION" "${UUID}"
+    sudo mkfs.btrfs --force --checksum crc32c --label "$LABEL" /dev/mapper/"${UUID}"
+    
+    sudo cryptsetup -v luksClose "${UUID}"
+    echo "Partition: OK"
+    echo "Now you can unplug, replug device and use it :) "
+else
+    echo "Usage: ${0##*/} <Device> <Label>"
+    exit 1
 fi

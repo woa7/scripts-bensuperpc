@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 set -euo pipefail
 #//////////////////////////////////////////////////////////////
 #//   ____                                                   //
@@ -11,7 +11,7 @@ set -euo pipefail
 #//                                                          //
 #//  Script, 2021                                            //
 #//  Created: 27, May, 2021                                  //
-#//  Modified: 17, June, 2021                                //
+#//  Modified: 24, July, 2021                                //
 #//  file: -                                                 //
 #//  -                                                       //
 #//  Source: https://unix.stackexchange.com/a/39341/359833                                               //
@@ -22,7 +22,7 @@ set -euo pipefail
 #//////////////////////////////////////////////////////////////
 
 if [ $# -eq 0 ]; then
-    read -p "Uninstall Software ? [Y/n]: " answ
+    read -r -p "Uninstall Software ? [Y/n]: " answ
     if [ "$answ" == 'n' ]; then
         exit 1
     fi
@@ -54,11 +54,21 @@ sudo ./uninstall.sh all
 echo "Removing Bash-Snippet done"
 
 echo "Removing git-extras..."
-cd /usr/bin/ben_script/git-extras
+cd /usr/bin/ben_script/git/git-extras
 sudo make uninstall
 echo "Removing git-extras done"
 
-echo "Removing ben's scripts, git-scripts, git-extra-commands, cryptr..."
+echo "Removing git-quick-stats..."
+cd /usr/bin/ben_script/git/git-quick-stats
+sudo make uninstall
+echo "Removing git-quick-stats done"
+
+echo "Removing fff..."
+cd /usr/bin/ben_script/fff
+sudo make uninstall
+echo "Removing fff done"
+
+echo "Removing ben's scripts, git-scripts, git-extra-commands, cryptr, bash-scripts, shell-scripts, docker-scripts, gpg-encrypt, spoofpoint..."
 echo "Remove symlink..."
 sudo find /usr/bin -lname '/usr/bin/ben_script/*' -delete
 echo "Remove symlink done"

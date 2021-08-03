@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 set -euo pipefail
 #//////////////////////////////////////////////////////////////
 #//   ____                                                   //
@@ -10,8 +10,8 @@ set -euo pipefail
 #//////////////////////////////////////////////////////////////
 #//                                                          //
 #//  Script, 2020                                            //
-#//  Created: 20, december, 2020                             //
-#//  Modified: 20, december, 2020                            //
+#//  Created: 20, December, 2020                             //
+#//  Modified: 24, July, 2021                                //
 #//  file: -                                                 //
 #//  -                                                       //
 #//  Source: -                                               //
@@ -20,7 +20,7 @@ set -euo pipefail
 #//                                                          //
 #//////////////////////////////////////////////////////////////
 #Convert png to Webp
-find . -name "*.png" | parallel -eta cwebp -metadata all -mt -lossless -exact -z 8 {} -o {.}.webp
+find . -name "*.png" | parallel -eta cwebp -metadata all -mt -lossless -exact -z 8 "{}" -o "{.}.webp"
 #Copy atime and mtime
-find . -name "*.png" -exec sh -c 'touch -r "${0%.*}.png" "${0%.*}.webp"' {} ';'
+find . -name "*.png" -exec sh -c 'touch -r "${0%.*}.png" "${0%.*}.webp"' "{}" ';'
 
